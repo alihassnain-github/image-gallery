@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from "next/image"
 
 type propsType = {
     width: number,
@@ -11,7 +11,7 @@ export default function ImgContainer({ width, height, src, alt }: propsType) {
     return (
         <div>
             <Image
-                priority={true}
+                className="mb-4"
                 src={src}
                 width={width}
                 height={height}

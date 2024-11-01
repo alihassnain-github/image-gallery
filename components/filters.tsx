@@ -59,6 +59,19 @@ export default function Filters() {
                         </Select>
                         <Select>
                             <SelectTrigger className="max-w-64">
+                                <SelectValue placeholder="All Sizes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem value="all-sizes">All Sizes</SelectItem>
+                                    <SelectItem value="large">Large</SelectItem>
+                                    <SelectItem value="medium">Medium</SelectItem>
+                                    <SelectItem value="small">Small</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                        <Select>
+                            <SelectTrigger className="max-w-64">
                                 <SelectValue placeholder="Enter hex Code" />
                             </SelectTrigger>
                             <SelectContent>

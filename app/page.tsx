@@ -1,12 +1,13 @@
 "use client";
 
+import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import Filters from "@/components/filters";
 import ImgContainer from "@/components/img-container";
 import ImgSkeleton from "@/components/img-skeleton";
 import ImgWrapper from "@/components/img-wrapper";
 import Navbar from "@/components/navbar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type ImageType = {
   id: number,
@@ -37,49 +38,58 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const fetchPhotos = async (page: number) => {
+  const fetchPhotos = useCallback(async (page: number) => {
     setLoading(true);
     try {
       const response = await axios.get(`https://api.pexels.com/v1/curated`, {
-        params: { page, per_page: 40 },
+        params: { page, per_page: 2 },
         headers: {
           Authorization: process.env.NEXT_PUBLIC_authKey
         }
       });
-      setPhotos([...photos, ...response.data.photos])
-      setCurrentPage(currentPage + 1);
+      const newPhotos = response.data.photos;
+      console.log(response);
+      setPhotos((prev) => [...prev, ...newPhotos])
     } catch (error) {
       console.error("Error fetching photos:", error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchPhotos(currentPage);
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-        fetchPhotos(currentPage);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    fetchPhotos(currentPage);
   }, [currentPage]);
 
+  const handleScroll = () => {
+    if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <main className="p-4 bg-slate-50 min-h-screen">
+    <main className="p-4 min-h-screen max-w-[1600px] mx-auto">
       <Navbar />
       <Filters />
       <ImgWrapper>
         {
           loading ? (
-            <ImgSkeleton />
+            <>
+              <ImgSkeleton />
+              <ImgSkeleton />
+              <ImgSkeleton />
+              <ImgSkeleton />
+              <ImgSkeleton />
+            </>
           ) : (
             photos.length > 0 && (
-              photos.map(({ id, width, height, alt, src }) => (
-                <ImgContainer key={id} width={width} height={height} alt={alt} src={src.original} />
+              photos.map(({ width, height, alt, src }) => (
+                <ImgContainer key={uuidv4()} width={width} height={height} alt={alt} src={src.original} />
               ))
             )
           )
